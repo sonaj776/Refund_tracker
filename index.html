@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Refund Tracker">
+<meta name="theme-color" content="#f7f7f9">
+
+<title>Refund Tracker</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#f7f7f9;
+color:#17171a;
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif
+}
+
+button,input,select,textarea{font:inherit}
+
+.top{
+background:white;
+padding:calc(18px + env(safe-area-inset-top)) 18px 14px;
+position:sticky;
+top:0;
+z-index:5;
+border-bottom:1px solid #eee
+}
+
+.top h1{
+margin:0;
+font-size:29px
+}
+
+.top p{
+margin:5px 0 0;
+color:#777;
+font-size:13px
+}
+
+.content{
+padding:16px 16px calc(100px + env(safe-area-inset-bottom));
+max-width:720px;
+margin:auto
+}
+
+.stats{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px
+}
+
+.stat{
+background:white;
+border-radius:17px;
+padding:15px;
+box-shadow:0 1px 5px #0000000a
+}
+
+.stat small{
+color:#777;
+font-size:12px
+}
+
+.stat strong{
+display:block;
+font-size:23px;
+margin-top:4px
+}
+
+.search{
+margin:15px 0 10px
+}
+
+.search input{
+width:100%;
+padding:12px 14px;
+border:1px solid #ddd;
+border-radius:13px;
+background:white
+}
+
+.tabs{
+display:flex;
+gap:7px;
+overflow:auto;
+padding-bottom:5px;
+margin-bottom:12px
+}
+
+.tabs button{
+border:0;
+background:#e9e9ed;
+border-radius:999px;
+padding:9px 13px;
+white-space:nowrap;
+font-size:12px;
+font-weight:700
+}
+
+.tabs .on{
+background:#17171a;
+color:white
+}
+
+.list{
+display:flex;
+flex-direction:column;
+gap:10px
+}
+
+.order{
+background:white;
+border-radius:17px;
+padding:15px;
+box-shadow:0 1px 5px #0000000a
+}
+
+.head{
+display:flex;
+justify-content:space-between;
+gap:10px
+}
+
+.name{
+font-weight:750;
+font-size:17px
+}
+
+.muted{
+font-size:12px;
+color:#777;
+margin-top:3px
+}
+
+.refund{
+font-weight:800;
+font-size:17px
+}
+
+.pill{
+display:inline-block;
+border-radius:999px;
+padding:5px 9px;
+font-size:11px;
+font-weight:750;
+margin-top:10px
+}
+
+.pending{
+background:#fff0c7;
+color:#795900
+}
+
+.overdue{
+background:#ffdede;
+color:#9d1717
+}
+
+.review{
+background:#e5e9ff;
+color:#3045a5
+}
+
+.received{
+background:#d9f6df;
+color:#17652c
+}
+
+.details{
+font-size:13px;
+line-height:1.55;
+color:#555;
+margin-top:9px
+}
+
+.actions{
+display:flex;
+gap:7px;
+margin-top:11px;
+flex-wrap:wrap
+}
+
+.actions button{
+border:0;
+border-radius:10px;
+padding:8px 11px;
+font-size:12px;
+font-weight:700;
+background:#eee
+}
+
+.primary{
+background:#17171a!important;
+color:white
+}
+
+.danger{
+background:#ffe1e1!important;
+color:#991c1c
+}
+
+.empty{
+text-align:center;
+padding:48px 12px;
+color:#777
+}
+
+.fab{
+position:fixed;
+right:20px;
+bottom:calc(20px + env(safe-area-inset-bottom));
+width:59px;
+height:59px;
+border:0;
+border-radius:50%;
+background:#17171a;
+color:white;
+font-size:31px;
+box-shadow:0 6px 22px #0003;
+z-index:7
+}
+
+.modal{
+position:fixed;
+inset:0;
+background:#0007;
+display:none;
+align-items:flex-end;
+z-index:20
+}
+
+.sheet{
+background:white;
+border-radius:23px 23px 0 0;
+width:100%;
+max-height:94vh;
+overflow:auto;
+padding:20px 18px calc(22px + env(safe-area-inset-bottom))
+}
+
+.sheet h2{
+margin:0 0 8px
+}
+
+.hint{
+color:#777;
+font-size:12px;
+margin-bottom:13px
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px 10px
+}
+
+label{
+display:block;
+color:#666;
+font-size:11px;
+margin:9px 0 5px
+}
+
+input,select,textarea{
+width:100%;
+border:1px solid #ddd;
+border-radius:11px;
+padding:11px;
+background:white
+}
+
+textarea{
+min-height:70px;
+resize:vertical
+}
+
+.full{
+grid-column:1/-1
+}
+
+.sheetActions{
+display:flex;
+gap:9px;
+margin-top:16px
+}
+
+.sheetActions button{
+flex:1;
+border:0;
+border-radius:12px;
+padding:12px;
+font-weight:750
+}
+
+.save{
+background:#17171a;
+color:white
+}
+
+.tools{
+display:flex;
+gap:8px;
+margin:13px 0
+}
+
+.tools button{
+flex:1;
+border:0;
+border-radius:12px;
+background:white;
+padding:10px;
+font-size:12px;
+font-weight:700
+}
+
+.warning{
+background:#fff5d6;
+border-radius:14px;
+padding:12px;
+font-size:12px;
+color:#6b5600;
+margin-bottom:12px
+}
+</style>
+</head>
+
+<body>
+
+<header class="top">
+<h1>Refund Tracker</h1>
+<p>Your orders • reviews • dealer refunds</p>
+</header>
+
+<main class="content">
+
+<div class="stats">
+
+<div class="stat">
+<small>Expected back</small>
+<strong id="sExpected">₹0</strong>
+</div>
+
+<div class="stat">
+<small>Received</small>
+<strong id="sReceived">₹0</strong>
+</div>
+
+<div class="stat">
+<small>Pending</small>
+<strong id="sPending">₹0</strong>
+</div>
+
+<div class="stat">
+<small>Overdue</small>
+<strong id="sOverdue">₹0</strong>
+</div>
+
+</div>
+
+<div class="tools">
+<button onclick="exportData()">Backup</button>
+<button onclick="document.getElementById('importFile').click()">Restore</button>
+<input id="importFile" type="file" accept=".json" hidden onchange="importData(event)">
+</div>
+
+<div class="search">
+<input id="search"
+placeholder="Search product, dealer or order ID..."
+oninput="render()">
+</div>
+
+<div class="tabs">
+
+<button class="on" data-filter="all">All</button>
+
+<button data-filter="review">
+Review pending
+</button>
+
+<button data-filter="pending">
+Refund pending
+</button>
+
+<button data-filter="overdue">
+Overdue
+</button>
+
+<button data-filter="received">
+Received
+</button>
+
+</div>
+
+<div id="list" class="list"></div>
+
+</main>
+
+<button class="fab" onclick="openAdd()">+</button>
+
+
+<div class="modal" id="modal">
+
+<div class="sheet">
+
+<h2 id="modalTitle">Add order</h2>
+
+<div class="hint">
+Enter the dealer's promised refund period and the app will calculate the expected date automatically.
+</div>
+
+<div class="grid">
+
+<div class="full">
+<label>Product name *</label>
+<input id="product" placeholder="Example: Kurti">
+</div>
+
+<div>
+<label>Platform</label>
+
+<select id="platform">
+
+<option>Amazon</option>
+<option>Meesho</option>
+<option>Flipkart</option>
+<option>Myntra</option>
+<option>Ajio</option>
+<option>Other</option>
+
+</select>
+
+</div>
+
+<div>
+<label>Order ID</label>
+<input id="orderId" placeholder="Optional">
+</div>
+
+<div>
+<label>Order date *</label>
+<input id="orderDate" type="date">
+</div>
+
+<div>
+<label>Order amount ₹</label>
+<input id="price" type="number" min="0">
+</div>
+
+<div>
+<label>Refund promised ₹ *</label>
+<input id="refund" type="number" min="0">
+</div>
+
+<div>
+<label>Refund after (days)</label>
+<input id="days" type="number" min="0" value="15">
+</div>
+
+<div>
+<label>Review required?</label>
+
+<select id="reviewRequired">
+
+<option value="yes">Yes</option>
+<option value="no">No</option>
+
+</select>
+
+</div>
+
+<div>
+<label>Review submitted?</label>
+
+<select id="reviewSubmitted">
+
+<option value="no">No</option>
+<option value="yes">Yes</option>
+
+</select>
+
+</div>
+
+<div>
+<label>Review date</label>
+<input id="reviewDate" type="date">
+</div>
+
+<div>
+<label>Dealer name</label>
+<input id="dealer" placeholder="Optional">
+</div>
+
+<div class="full">
+
+<label>Dealer promise / notes</label>
+
+<textarea id="notes"
+placeholder="Example: Refund within 15 days after review"></textarea>
+
+</div>
+
+</div>
+
+<div class="sheetActions">
+
+<button onclick="closeModal()">
+Cancel
+</button>
+
+<button class="save" onclick="saveOrder()">
+Save order
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const KEY="myRefundTracker";
+
+let orders=
+JSON.parse(localStorage.getItem(KEY)||"[]");
+
+let filter="all";
+let editing=null;
+
+
+function money(n){
+
+return "₹"+
+Number(n||0).toLocaleString("en-IN",
+{maximumFractionDigits:0});
+
+}
+
+
+function today(){
+
+let d=new Date();
+
+d.setHours(0,0,0,0);
+
+return d;
+
+}
+
+
+function dueDate(o){
+
+if(!o.orderDate)
+return null;
+
+let d=
+new Date(o.orderDate+"T00:00:00");
+
+d.setDate(
+d.getDate()+Number(o.days||0)
+);
+
+return d;
+
+}
+
+
+function dateText(d){
+
+if(!d)
+return "—";
+
+return d.toLocaleDateString(
+"en-IN",
+{
+day:"numeric",
+month:"short",
+year:"numeric"
+}
+);
+
+}
+
+
+function status(o){
+
+if(o.received)
+return "received";
+
+if(
+o.reviewRequired==="yes" &&
+o.reviewSubmitted!=="yes"
+)
+return "review";
+
+let d=dueDate(o);
+
+if(d && d<today())
+return "overdue";
+
+return "pending";
+
+}
+
+
+function statusText(s){
+
+if(s==="received")
+return "Refund received";
+
+if(s==="review")
+return "Review pending";
+
+if(s==="overdue")
+return "Refund overdue";
+
+return "Refund pending";
+
+}
+
+
+function save(){
+
+localStorage.setItem(
+KEY,
+JSON.stringify(orders)
+);
+
+render();
+
+}
+
+
+function escapeText(s){
+
+return String(s||"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+function render(){
+
+let expected=0;
+let received=0;
+let pending=0;
+let overdue=0;
+
+orders.forEach(o=>{
+
+if(o.received){
+
+received+=Number(
+o.receivedAmount||o.refund||0
+);
+
+}else{
+
+pending+=Number(o.refund||0);
+
+}
+
+if(!o.received){
+
+expected+=Number(o.refund||0);
+
+}
+
+if(status(o)==="overdue"){
+
+overdue+=Number(o.refund||0);
+
+}
+
+});
+
+
+document.getElementById("sExpected")
+.innerText=money(expected);
+
+document.getElementById("sReceived")
+.innerText=money(received);
+
+document.getElementById("sPending")
+.innerText=money(pending);
+
+document.getElementById("sOverdue")
+.innerText=money(overdue);
+
+
+let q=
+document.getElementById("search")
+.value
+.toLowerCase()
+.trim();
+
+
+let shown=orders.filter(o=>{
+
+let matchesFilter=
+filter==="all" ||
+status(o)===filter;
+
+let text=[
+o.product,
+o.dealer,
+o.orderId,
+o.platform
+]
+.join(" ")
+.toLowerCase();
+
+return matchesFilter &&
+(!q || text.includes(q));
+
+});
+
+
+shown.sort((a,b)=>{
+
+let da=dueDate(a);
+let db=dueDate(b);
+
+return (da||new Date(9999,0,1))-
+       (db||new Date(9999,0,1));
+
+});
+
+
+let html="";
+
+
+shown.forEach(o=>{
+
+let s=status(o);
+let d=dueDate(o);
+
+html+=`
+
+<article class="order">
+
+<div class="head">
+
+<div>
+
+<div class="name">
+${escapeText(o.product)}
+</div>
+
+<div class="muted">
+
+${escapeText(o.platform)}
+
+${o.orderId?
+" • "+escapeText(o.orderId):""}
+
+</div>
+
+</div>
+
+<div class="refund">
+${money(o.refund)}
+</div>
+
+</div>
+
+
+<span class="pill ${s}">
+${statusText(s)}
+</span>
+
+
+<div class="details">
+
+Order date:
+<b>${dateText(
+o.orderDate?
+new Date(o.orderDate+"T00:00:00"):
+null
+)}</b>
+
+<br>
+
+Expected refund:
+<b>${dateText(d)}</b>
+
+<br>
+
+Review:
+<b>
+
+${
+o.reviewRequired==="no"
+?"Not required":
+o.reviewSubmitted==="yes"
+?"Submitted":
+"Not submitted"
+}
+
+</b>
+
+${o.dealer?
+`<br>Dealer:
+<b>${escapeText(o.dealer)}</b>`
+:""}
+
+${o.received?
+`<br>Received:
+<b>${dateText(
+new Date(o.receivedDate+"T00:00:00")
+)}</b>
+ • Amount:
+<b>${money(o.receivedAmount)}</b>`
+:""}
+
+${o.notes?
+`<br>${escapeText(o.notes)}`
+:""}
+
+</div>
+
+
+<div class="actions">
+
+<button onclick="editOrder('${o.id}')">
+Edit
+</button>
+
+${
+!o.received
+
+?
+`<button class="primary"
+onclick="receiveRefund('${o.id}')">
+Mark received
+</button>`
+
+:
+
+`<button onclick="undoReceived('${o.id}')">
+Undo received
+</button>`
+}
+
+<button class="danger"
+onclick="deleteOrder('${o.id}')">
+Delete
+</button>
+
+</div>
+
+</article>
+
+`;
+
+});
+
+
+document.getElementById("list").innerHTML=
+html ||
+`<div class="empty">
+
+No orders found.<br><br>
+
+Tap <b>+</b> to add your first order.
+
+</div>`;
+
+}
+
+
+function openAdd(){
+
+editing=null;
+
+document.getElementById("modalTitle")
+.innerText="Add order";
+
+clearForm();
+
+document.getElementById("orderDate")
+.value=
+new Date()
+.toISOString()
+.slice(0,10);
+
+document.getElementById("days")
+.value=15;
+
+document.getElementById("modal")
+.style.display="flex";
+
+}
+
+
+function clearForm(){
+
+[
+"product",
+"orderId",
+"price",
+"refund",
+"reviewDate",
+"dealer",
+"notes"
+]
+.forEach(id=>{
+document.getElementById(id).value="";
+});
+
+document.getElementById("platform")
+.value="Amazon";
+
+document.getElementById("reviewRequired")
+.value="yes";
+
+document.getElementById("reviewSubmitted")
+.value="no";
+
+}
+
+
+function closeModal(){
+
+document.getElementById("modal")
+.style.display="none";
+
+}
+
+
+function saveOrder(){
+
+let product=
+document.getElementById("product")
+.value.trim();
+
+let refund=
+document.getElementById("refund")
+.value;
+
+let orderDate=
+document.getElementById("orderDate")
+.value;
+
+
+if(!product || !refund || !orderDate){
+
+alert(
+"Please enter product name, order date and promised refund."
+);
+
+return;
+
+}
+
+
+let data={
+
+product,
+
+platform:
+document.getElementById("platform").value,
+
+orderId:
+document.getElementById("orderId").value.trim(),
+
+orderDate,
+
+price:
+document.getElementById("price").value,
+
+refund,
+
+days:
+document.getElementById("days").value,
+
+reviewRequired:
+document.getElementById("reviewRequired").value,
+
+reviewSubmitted:
+document.getElementById("reviewSubmitted").value,
+
+reviewDate:
+document.getElementById("reviewDate").value,
+
+dealer:
+document.getElementById("dealer").value.trim(),
+
+notes:
+document.getElementById("notes").value.trim()
+
+};
+
+
+if(editing){
+
+let o=
+orders.find(x=>x.id===editing);
+
+Object.assign(o,data);
+
+}else{
+
+orders.push({
+
+id:
+Date.now().toString(),
+
+...data,
+
+received:false
+
+});
+
+}
+
+
+save();
+
+closeModal();
+
+}
+
+
+function editOrder(id){
+
+let o=
+orders.find(x=>x.id===id);
+
+if(!o)
+return;
+
+editing=id;
+
+document.getElementById("modalTitle")
+.innerText="Edit order";
+
+
+document.getElementById("product").value=
+o.product||"";
+
+document.getElementById("platform").value=
+o.platform||"Amazon";
+
+document.getElementById("orderId").value=
+o.orderId||"";
+
+document.getElementById("orderDate").value=
+o.orderDate||"";
+
+document.getElementById("price").value=
+o.price||"";
+
+document.getElementById("refund").value=
+o.refund||"";
+
+document.getElementById("days").value=
+o.days??15;
+
+document.getElementById("reviewRequired").value=
+o.reviewRequired??"yes";
+
+document.getElementById("reviewSubmitted").value=
+o.reviewSubmitted??"no";
+
+document.getElementById("reviewDate").value=
+o.reviewDate||"";
+
+document.getElementById("dealer").value=
+o.dealer||"";
+
+document.getElementById("notes").value=
+o.notes||"";
+
+
+document.getElementById("modal")
+.style.display="flex";
+
+}
+
+
+function receiveRefund(id){
+
+let o=
+orders.find(x=>x.id===id);
+
+if(!o)
+return;
+
+let amount=
+prompt(
+"How much refund did you receive?",
+String(o.refund)
+);
+
+if(amount===null)
+return;
+
+amount=Number(amount);
+
+if(isNaN(amount))
+return;
+
+o.received=true;
+
+o.receivedAmount=amount;
+
+o.receivedDate=
+new Date()
+.toISOString()
+.slice(0,10);
+
+save();
+
+}
+
+
+function undoReceived(id){
+
+let o=
+orders.find(x=>x.id===id);
+
+if(!o)
+return;
+
+o.received=false;
+
+delete o.receivedAmount;
+delete o.receivedDate;
+
+save();
+
+}
+
+
+function deleteOrder(id){
+
+if(!confirm(
+"Delete this order permanently?"
+))
+return;
+
+orders=
+orders.filter(o=>o.id!==id);
+
+save();
+
+}
+
+
+document
+.querySelectorAll(".tabs button")
+.forEach(button=>{
+
+button.onclick=()=>{
+
+document
+.querySelectorAll(".tabs button")
+.forEach(x=>
+x.classList.remove("on")
+);
+
+button.classList.add("on");
+
+filter=
+button.dataset.filter;
+
+render();
+
+};
+
+});
+
+
+function exportData(){
+
+let data=
+JSON.stringify(
+orders,
+null,
+2
+);
+
+let blob=
+new Blob(
+[data],
+{type:"application/json"}
+);
+
+let url=
+URL.createObjectURL(blob);
+
+let a=
+document.createElement("a");
+
+a.href=url;
+
+a.download=
+"refund-tracker-backup.json";
+
+a.click();
+
+URL.revokeObjectURL(url);
+
+}
+
+
+function importData(event){
+
+let file=
+event.target.files[0];
+
+if(!file)
+return;
+
+let reader=
+new FileReader();
+
+reader.onload=()=>{
+
+try{
+
+let data=
+JSON.parse(reader.result);
+
+if(!Array.isArray(data))
+throw new Error();
+
+if(confirm(
+"Replace your current data with this backup?"
+)){
+
+orders=data;
+
+save();
+
+}
+
+}catch{
+
+alert(
+"Invalid backup file."
+);
+
+}
+
+};
+
+reader.readAsText(file);
+
+}
+
+
+render();
+
+</script>
+
+</body>
+</html>
